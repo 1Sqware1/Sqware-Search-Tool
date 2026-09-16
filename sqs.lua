@@ -1,6 +1,7 @@
 local home = os.getenv("HOME")
 local config_dir = home .. "/.config/sqs"
 local db_path = config_dir .. "/sqs_index.db"
+math.randomseed(os.time())
 
 local function get_arg_value(flag)
 	for i = 1, #arg do
@@ -74,10 +75,44 @@ if arg[1] == "--info" or #arg == 0 then
 
 end
 
+-- im felling lucjy
+if arg[1] == "--im-feeling-lucky" then
+	local index_file = io.open(db_path, "r")
+	if not index_file then
+		print("T_T Error: Database not found. Run with --index first.")
+		os.exit(1)
+	end
+
+	local total_lines = 0
+	for _ in index_file:lines() do
+		total_lines = total_lines + 1
+	end
+	index_file:close()
+
+	if total_lines == 0 then
+		print("T_T Error: Database is empty. Run with --index first.")
+		os.exit(1)
+	end
+
+	local lucky_number = math.random(1, total_lines)
+
+	index_file = io.open(db_path, "r")
+	local current_line = 0
+	for line in index_file:lines() do
+		current_line = current_line + 1
+		if current_line == lucky_number then
+			print("\27[35m You are lucky :3 Found:\27[0m " .. line)
+			break
+		end
+	end
+	index_file:close()
+	os.exit()
+end
+
 
 -- help
 if arg[1] == "--help" or #arg == 0 then
-	print("Usage: lua sqs.lua -s <name> [-t <extension>]. --info, --index")
+	print("Usage: lua sqs.lua -s <name> [-t <extension>]. --info, --index, --im-feeling-lucky.")
 end
 
 
